@@ -46,7 +46,7 @@ domain=$IP2
 fi
 until [[ $VPN_USER =~ ^[a-zA-Z0-9_]+$ && ${CLIENT_EXISTS} == '0' ]]; do
 		read -rp "Username : " -e VPN_USER
-		CLIENT_EXISTS=$(grep -w $VPN_USER /var/lib/akbarstorevpn/data-user-l2tp | wc -l)
+		CLIENT_EXISTS=$(grep -w $VPN_USER /var/lib/HE3ndrixx/data-user-l2tp | wc -l)
 
 		if [[ ${CLIENT_EXISTS} == '1' ]]; then
 			echo ""
@@ -72,7 +72,7 @@ EOF
 
 # Update file attributes
 chmod 600 /etc/ppp/chap-secrets* /etc/ipsec.d/passwd*
-echo -e "### $VPN_USER $exp">>"/var/lib/akbarstorevpn/data-user-l2tp"
+echo -e "### $VPN_USER $exp">>"/var/lib/HE3ndrixx/data-user-l2tp"
 cat <<EOF
 
 ============================

@@ -314,6 +314,6 @@ wget -O /usr/bin/addpptp https://${akbarvpn}/addpptp.sh && chmod +x /usr/bin/add
 wget -O /usr/bin/delpptp https://${akbarvpn}/delpptp.sh && chmod +x /usr/bin/delpptp
 wget -O /usr/bin/renewpptp https://${akbarvpn}/renewpptp.sh && chmod +x /usr/bin/renewpptp
 wget -O /usr/bin/renewl2tp https://${akbarvpn}/renewl2tp.sh && chmod +x /usr/bin/renewl2tp
-touch /var/lib/akbarstorevpn/data-user-l2tp
-touch /var/lib/akbarstorevpn/data-user-pptp
+touch /var/lib/HE3ndrixx/data-user-l2tp
+touch /var/lib/HE3ndrixx/data-user-pptp
 rm -f /root/ipsec.sh
