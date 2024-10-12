@@ -33,39 +33,44 @@ echo -e "${NC}${LIGHT}Telegram : https://t.me/T_OpPLUG"
 exit 0
 fi
 clear
-NUMBER_OF_CLIENTS=$(grep -c -E "^### " "/etc/trojan-go/akun.conf")
-	if [[ ${NUMBER_OF_CLIENTS} == '0' ]]; then
-		echo ""
-		echo "You have no existing clients!"
-		exit 1
-	fi
+uuid=$(cat /etc/trojan-go/uuid.txt)
+source /var/lib/akbarstorevpn/ipvps.conf
+if [[ "$IP" = "" ]]; then
+domain=$(cat /etc/xray/domain)
+else
+domain=$IP
+fi
+trgo="$(cat ~/log-install.txt | grep -w "Tr Go" | cut -d: -f2|sed 's/ //g')"
+until [[ $user =~ ^[a-zA-Z0-9_]+$ && ${user_EXISTS} == '0' ]]; do
+		read -rp "Password : " -e user
+		user_EXISTS=$(grep -w $user /etc/trojan-go/akun.conf | wc -l)
 
-	echo ""
-	echo " Select the existing client you want to remove"
-	echo " Press CTRL+C to return"
-	echo " ==============================="
-	echo "     No  Expired   User"
-	grep -E "^### " "/etc/trojan-go/akun.conf" | cut -d ' ' -f 2-3 | nl -s ') '
-	until [[ ${CLIENT_NUMBER} -ge 1 && ${CLIENT_NUMBER} -le ${NUMBER_OF_CLIENTS} ]]; do
-		if [[ ${CLIENT_NUMBER} == '1' ]]; then
-			read -rp "Select one client [1]: " CLIENT_NUMBER
-		else
-			read -rp "Select one client [1-${NUMBER_OF_CLIENTS}]: " CLIENT_NUMBER
+		if [[ ${user_EXISTS} == '1' ]]; then
+			echo ""
+			echo -e "Username ${RED}${user}${NC} Already On VPS Please Choose Another"
+			exit 1
 		fi
 	done
-CLIENT_NAME=$(grep -E "^### " "/etc/trojan-go/akun.conf" | cut -d ' ' -f 2-3 | sed -n "${CLIENT_NUMBER}"p)
-user=$(grep -E "^### " "/etc/trojan-go/akun.conf" | cut -d ' ' -f 2 | sed -n "${CLIENT_NUMBER}"p)
-exp=$(grep -E "^### " "/etc/trojan-go/akun.conf" | cut -d ' ' -f 3 | sed -n "${CLIENT_NUMBER}"p)
-sed -i "/^### $user $exp/d" /etc/trojan-go/akun.conf
-sed -i '/^,"'"$user"'"$/d' /etc/trojan-go/config.json
+read -p "Expired (Days) : " masaaktif
+sed -i '/"'""$uuid""'"$/a\,"'""$user""'"' /etc/trojan-go/config.json
+exp=`date -d "$masaaktif days" +"%Y-%m-%d"`
+hariini=`date -d "0 days" +"%Y-%m-%d"`
+echo -e "### $user $exp" >> /etc/trojan-go/akun.conf
 systemctl restart trojan-go.service
-service cron restart
+link="trojan-go://${user}@${domain}:${trgo}/?sni=${domain}&type=ws&host=${domain}&path=/trojango&encryption=none#$user"
 clear
-echo ""
-echo "============================"
-echo "  TrojanGo Account Deleted  "
-echo "============================"
-echo "Username : $user"
-echo "Expired  : $exp"
-echo "============================"
-echo "Script By 🧑‍💻🥷🎮☁️🎰🌊🛫☁️☁️☁️☁️☁️☁️☁️🏦💵♾️⛽ Cyberpunk☁️"
+echo -e ""
+echo -e "=======-TROJAN-GO-======="
+echo -e "Remarks    : ${user}"
+echo -e "IP/Host    : ${MYIP}"
+echo -e "Address    : ${domain}"
+echo -e "Port       : ${trgo}"
+echo -e "Key        : ${user}"
+echo -e "Encryption : none"
+echo -e "Path       : /trojango"
+echo -e "Created    : $hariini"
+echo -e "Expired    : $exp"
+echo -e "========================="
+echo -e "Link TrGo  : ${link}"
+echo -e "========================="
+echo -e "Script By 🧑‍💻🥷🎮☁️🎰🌊🛫☁️☁️☁️☁️☁️☁️☁️🏦💵♾️⛽ Cyberpunk☁️"
