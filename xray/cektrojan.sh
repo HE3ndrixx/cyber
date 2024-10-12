@@ -33,38 +33,43 @@ echo -e "${NC}${LIGHT}Telegram : https://t.me/T_OpPLUG"
 exit 0
 fi
 clear
-NUMBER_OF_CLIENTS=$(grep -c -E "^#&# " "/etc/xray/config.json")
-	if [[ ${NUMBER_OF_CLIENTS} == '0' ]]; then
-		echo ""
-		echo "You have no existing clients!"
-		exit 1
-	fi
-
-	echo ""
-	echo " Select the existing client you want to remove"
-	echo " Press CTRL+C to return"
-	echo " ==============================="
-	echo "     No  Expired   User"
-	grep -E "^#&# " "/etc/xray/config.json" | cut -d ' ' -f 2-3 | nl -s ') '
-	until [[ ${CLIENT_NUMBER} -ge 1 && ${CLIENT_NUMBER} -le ${NUMBER_OF_CLIENTS} ]]; do
-		if [[ ${CLIENT_NUMBER} == '1' ]]; then
-			read -rp "Select one client [1]: " CLIENT_NUMBER
-		else
-			read -rp "Select one client [1-${NUMBER_OF_CLIENTS}]: " CLIENT_NUMBER
-		fi
-	done
-user=$(grep -E "^#&# " "/etc/xray/config.json" | cut -d ' ' -f 2 | sed -n "${CLIENT_NUMBER}"p)
-exp=$(grep -E "^#&# " "/etc/xray/config.json" | cut -d ' ' -f 3 | sed -n "${CLIENT_NUMBER}"p)
-sed -i "/^#&# $user $exp/,/^},{/d" /etc/xray/config.json
-sed -i "/^#&# $user $exp/,/^},{/d" /etc/xray/config.json
-systemctl restart xray.service
-service cron restart
-clear
-echo ""
-echo "================================"
-echo "  XRAYS/Trojan Account Deleted  "
-echo "================================"
-echo "Username  : $user"
-echo "Expired   : $exp"
-echo "================================"
+echo -n > /tmp/other.txt
+data=( `cat /etc/xray/config.json | grep '^#&#' | cut -d ' ' -f 2`);
+echo "-----------------------------------------";
+echo "---------=[ Trojan User Login ]=---------";
+echo "-----------------------------------------";
+for akun in "${data[@]}"
+do
+if [[ -z "$akun" ]]; then
+akun="tidakada"
+fi
+echo -n > /tmp/iptrojan.txt
+data2=( `netstat -anp | grep ESTABLISHED | grep tcp6 | grep xray | awk '{print $5}' | cut -d: -f1 | sort | uniq`);
+for ip in "${data2[@]}"
+do
+jum=$(cat /var/log/xray/access.log | grep -w $akun | awk '{print $3}' | cut -d: -f1 | grep -w $ip | sort | uniq)
+if [[ "$jum" = "$ip" ]]; then
+echo "$jum" >> /tmp/iptrojan.txt
+else
+echo "$ip" >> /tmp/other.txt
+fi
+jum2=$(cat /tmp/iptrojan.txt)
+sed -i "/$jum2/d" /tmp/other.txt > /dev/null 2>&1
+done
+jum=$(cat /tmp/iptrojan.txt)
+if [[ -z "$jum" ]]; then
+echo > /dev/null
+else
+jum2=$(cat /tmp/iptrojan.txt | nl)
+echo "user : $akun";
+echo "$jum2";
+echo "-----------------------------------------"
+fi
+rm -rf /tmp/iptrojan.txt
+done
+oth=$(cat /tmp/other.txt | sort | uniq | nl)
+echo "other";
+echo "$oth";
+echo "-----------------------------------------"
 echo "Script By 🧑‍💻🥷🎮☁️🎰🌊🛫☁️☁️☁️☁️☁️☁️☁️🏦💵♾️⛽ Cyberpunk☁️"
+rm -rf /tmp/other.txt

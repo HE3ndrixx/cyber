@@ -27,24 +27,25 @@ echo -e "${NC}${GREEN}Permission Accepted...${NC}"
 else
 echo -e "${NC}${RED}Permission Denied!${NC}";
 echo -e "${NC}${LIGHT}Please Contact Admin!!"
-echo -e "${NC}${LIGHT}Facebook : https://TOpPLUG☁️☁️☁️☁️☁️🧑‍💻Cyberpunk🌊🧑‍💻☁️☁️☁️☁️☁️☁️🎰🗽☁️"
-echo -e "${NC}${LIGHT}WhatsApp : 0112386921"
+echo -e "${NC}${LIGHT}Facebook : https://🧑‍💻🥷🎮☁️🎰🌊🛫☁️☁️☁️☁️☁️☁️☁️🏦💵♾️⛽ Cyberpunk☁️"
+echo -e "${NC}${LIGHT}WhatsApp : 081545854516"
 echo -e "${NC}${LIGHT}Telegram : https://t.me/T_OpPLUG"
 exit 0
 fi
 clear
 NUMBER_OF_CLIENTS=$(grep -c -E "^#&# " "/etc/xray/config.json")
 	if [[ ${NUMBER_OF_CLIENTS} == '0' ]]; then
+		clear
 		echo ""
 		echo "You have no existing clients!"
 		exit 1
 	fi
 
+	clear
 	echo ""
-	echo " Select the existing client you want to remove"
+	echo "Select the existing client you want to renew"
 	echo " Press CTRL+C to return"
-	echo " ==============================="
-	echo "     No  Expired   User"
+	echo -e "==============================="
 	grep -E "^#&# " "/etc/xray/config.json" | cut -d ' ' -f 2-3 | nl -s ') '
 	until [[ ${CLIENT_NUMBER} -ge 1 && ${CLIENT_NUMBER} -le ${NUMBER_OF_CLIENTS} ]]; do
 		if [[ ${CLIENT_NUMBER} == '1' ]]; then
@@ -53,18 +54,22 @@ NUMBER_OF_CLIENTS=$(grep -c -E "^#&# " "/etc/xray/config.json")
 			read -rp "Select one client [1-${NUMBER_OF_CLIENTS}]: " CLIENT_NUMBER
 		fi
 	done
+read -p "Expired (Days) : " masaaktif
 user=$(grep -E "^#&# " "/etc/xray/config.json" | cut -d ' ' -f 2 | sed -n "${CLIENT_NUMBER}"p)
 exp=$(grep -E "^#&# " "/etc/xray/config.json" | cut -d ' ' -f 3 | sed -n "${CLIENT_NUMBER}"p)
-sed -i "/^#&# $user $exp/,/^},{/d" /etc/xray/config.json
-sed -i "/^#&# $user $exp/,/^},{/d" /etc/xray/config.json
-systemctl restart xray.service
-service cron restart
+now=$(date +%Y-%m-%d)
+d1=$(date -d "$exp" +%s)
+d2=$(date -d "$now" +%s)
+exp2=$(( (d1 - d2) / 86400 ))
+exp3=$(($exp2 + $masaaktif))
+exp4=`date -d "$exp3 days" +"%Y-%m-%d"`
+sed -i "s/#&# $user $exp/#&# $user $exp4/g" /etc/xray/config.json
 clear
 echo ""
 echo "================================"
-echo "  XRAYS/Trojan Account Deleted  "
+echo "  XRAYS/Trojan Account Renewed  "
 echo "================================"
 echo "Username  : $user"
-echo "Expired   : $exp"
+echo "Expired  : $exp4"
 echo "================================"
 echo "Script By 🧑‍💻🥷🎮☁️🎰🌊🛫☁️☁️☁️☁️☁️☁️☁️🏦💵♾️⛽ Cyberpunk☁️"

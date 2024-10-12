@@ -28,43 +28,47 @@ else
 echo -e "${NC}${RED}Permission Denied!${NC}";
 echo -e "${NC}${LIGHT}Please Contact Admin!!"
 echo -e "${NC}${LIGHT}Facebook : https://TOpPLUG☁️☁️☁️☁️☁️🧑‍💻Cyberpunk🌊🧑‍💻☁️☁️☁️☁️☁️☁️🎰🗽☁️"
-echo -e "${NC}${LIGHT}WhatsApp : 0112386921"
+echo -e "${NC}${LIGHT}WhatsApp : 254112386921"
 echo -e "${NC}${LIGHT}Telegram : https://t.me/T_OpPLUG"
 exit 0
 fi
 clear
-NUMBER_OF_CLIENTS=$(grep -c -E "^#&# " "/etc/xray/config.json")
-	if [[ ${NUMBER_OF_CLIENTS} == '0' ]]; then
-		echo ""
-		echo "You have no existing clients!"
-		exit 1
-	fi
+source /var/lib/akbarstorevpn/ipvps.conf
+if [[ "$IP" = "" ]]; then
+domain=$(cat /etc/xray/domain)
+else
+domain=$IP
+fi
+tr="$(cat ~/log-install.txt | grep -w "Trojan" | cut -d: -f2|sed 's/ //g')"
+until [[ $user =~ ^[a-zA-Z0-9_]+$ && ${user_EXISTS} == '0' ]]; do
+		read -rp "Password : " -e user
+		user_EXISTS=$(grep -w $user /etc/xray/config.json | wc -l)
 
-	echo ""
-	echo " Select the existing client you want to remove"
-	echo " Press CTRL+C to return"
-	echo " ==============================="
-	echo "     No  Expired   User"
-	grep -E "^#&# " "/etc/xray/config.json" | cut -d ' ' -f 2-3 | nl -s ') '
-	until [[ ${CLIENT_NUMBER} -ge 1 && ${CLIENT_NUMBER} -le ${NUMBER_OF_CLIENTS} ]]; do
-		if [[ ${CLIENT_NUMBER} == '1' ]]; then
-			read -rp "Select one client [1]: " CLIENT_NUMBER
-		else
-			read -rp "Select one client [1-${NUMBER_OF_CLIENTS}]: " CLIENT_NUMBER
+		if [[ ${user_EXISTS} == '1' ]]; then
+			echo ""
+			echo -e "Username ${RED}${user}${NC} Already On VPS Please Choose Another"
+			exit 1
 		fi
 	done
-user=$(grep -E "^#&# " "/etc/xray/config.json" | cut -d ' ' -f 2 | sed -n "${CLIENT_NUMBER}"p)
-exp=$(grep -E "^#&# " "/etc/xray/config.json" | cut -d ' ' -f 3 | sed -n "${CLIENT_NUMBER}"p)
-sed -i "/^#&# $user $exp/,/^},{/d" /etc/xray/config.json
-sed -i "/^#&# $user $exp/,/^},{/d" /etc/xray/config.json
+read -p "Expired (Days) : " masaaktif
+hariini=`date -d "0 days" +"%Y-%m-%d"`
+exp=`date -d "$masaaktif days" +"%Y-%m-%d"`
+sed -i '/#xray-trojan$/a\#&# '"$user $exp"'\
+},{"password": "'""$user""'","email": "'""$user""'"' /etc/xray/config.json
 systemctl restart xray.service
+trojanlink="trojan://${user}@${domain}:${tr}"
 service cron restart
 clear
-echo ""
-echo "================================"
-echo "  XRAYS/Trojan Account Deleted  "
-echo "================================"
-echo "Username  : $user"
-echo "Expired   : $exp"
-echo "================================"
-echo "Script By 🧑‍💻🥷🎮☁️🎰🌊🛫☁️☁️☁️☁️☁️☁️☁️🏦💵♾️⛽ Cyberpunk☁️"
+echo -e ""
+echo -e "======-XRAYS/TROJAN-======"
+echo -e "Remarks  : ${user}"
+echo -e "IP/Host  : ${MYIP}"
+echo -e "Address  : ${domain}"
+echo -e "Port     : ${tr}"
+echo -e "Key      : ${user}"
+echo -e "Created  : $hariini"
+echo -e "Expired  : $exp"
+echo -e "=========================="
+echo -e "Link TR  : ${trojanlink}"
+echo -e "=========================="
+echo -e "Script By 🧑‍💻🥷🎮☁️🎰🌊🛫☁️☁️☁️☁️☁️☁️☁️🏦💵♾️⛽ Cyberpunk☁️"
